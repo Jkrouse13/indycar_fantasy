@@ -139,3 +139,30 @@ st_pete_results.each do |r|
 end
 
 puts "Done! St. Petersburg results seeded."
+
+puts "Seeding St. Petersburg tiers..."
+
+st_pete = Race.find_by(name: "Firestone Grand Prix of St. Petersburg")
+
+tiers = {
+  1 => [ "Alex Palou", "Pato O'Ward", "Scott McLaughlin", "David Malukas" ],
+  2 => [ "Felix Rosenqvist", "Marcus Ericsson", "Marcus Armstrong", "Christian Lundgaard" ],
+  3 => [ "Josef Newgarden", "Kyle Kirkwood", "Will Power", "Romain Grosjean", "Louis Foster", "Scott Dixon" ],
+  4 => [ "Rinus VeeKay", "Kyffin Simpson", "Alexander Rossi", "Christian Rasmussen", "Dennis Hauger" ],
+  5 => [ "Nolan Siegel", "Santino Ferrucci", "Graham Rahal" ],
+  6 => [ "Mick Schumacher", "Caio Collet", "Sting Ray Robb" ]
+}
+
+tiers.each do |tier_number, driver_names|
+  tier = RaceTier.find_or_create_by!(race: st_pete, tier_number: tier_number)
+  driver_names.each do |name|
+    driver = Driver.find_by(name: name)
+    if driver
+      TierDriver.find_or_create_by!(race_tier: tier, driver: driver)
+    else
+      puts "WARNING: Driver not found: #{name}"
+    end
+  end
+end
+
+puts "Done! St. Petersburg tiers seeded."
