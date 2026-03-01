@@ -92,3 +92,50 @@ races.each do |race_data|
 end
 
 puts "Done! #{Team.count} teams, #{Driver.count} drivers, #{Race.count} races seeded."
+
+puts "Seeding St. Petersburg race results..."
+
+# Update car numbers to reflect actual 2026 season
+Driver.find_by(car_number: 75)&.update!(car_number: 999) # temp
+Driver.find_by(car_number: 77)&.update!(car_number: 76)  # VeeKay -> 76
+Driver.find_by(car_number: 999)&.update!(car_number: 77) # Robb -> 77
+
+st_pete = Race.find_by(name: "Firestone Grand Prix of St. Petersburg")
+st_pete.update!(status: :final)
+
+st_pete_results = [
+  { car: 10, pos: 1  },  # Palou
+  { car: 3,  pos: 2  },  # McLaughlin
+  { car: 7,  pos: 3  },  # Lundgaard
+  { car: 27, pos: 4  },  # Kirkwood
+  { car: 5,  pos: 5  },  # O'Ward
+  { car: 28, pos: 6  },  # Ericsson
+  { car: 2,  pos: 7  },  # Newgarden
+  { car: 18, pos: 8  },  # Grosjean
+  { car: 76, pos: 9  },  # VeeKay
+  { car: 19, pos: 10 },  # Hauger
+  { car: 66, pos: 11 },  # Armstrong
+  { car: 60, pos: 12 },  # Rosenqvist
+  { car: 12, pos: 13 },  # Malukas
+  { car: 45, pos: 14 },  # Foster
+  { car: 8,  pos: 15 },  # Simpson
+  { car: 20, pos: 16 },  # Rossi
+  { car: 4,  pos: 17 },  # Collet
+  { car: 15, pos: 18 },  # Rahal
+  { car: 21, pos: 19 },  # Rasmussen
+  { car: 6,  pos: 20 },  # Siegel
+  { car: 77, pos: 21 },  # Robb
+  { car: 26, pos: 22 },  # Power (Retired)
+  { car: 9,  pos: 23 },  # Dixon (Off Course)
+  { car: 14, pos: 24 },  # Ferrucci (Contact)
+  { car: 47, pos: 25 }  # Schumacher (Contact)
+]
+
+st_pete_results.each do |r|
+  driver = Driver.find_by(car_number: r[:car])
+  RaceResult.find_or_create_by!(race: st_pete, driver: driver) do |result|
+    result.finishing_position = r[:pos]
+  end
+end
+
+puts "Done! St. Petersburg results seeded."
