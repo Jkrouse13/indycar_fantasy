@@ -1,0 +1,18 @@
+require "test_helper"
+
+class Api::V1::RaceResultsControllerTest < ActionDispatch::IntegrationTest
+  test "should get index" do
+    get api_v1_race_results_index_url
+    assert_response :success
+  end
+
+  test "should get create" do
+    get api_v1_race_results_create_url
+    assert_response :success
+  end
+
+  test "should get update" do
+    get api_v1_race_results_update_url
+    assert_response :success
+  end
+end
