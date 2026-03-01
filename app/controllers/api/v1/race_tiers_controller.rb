@@ -1,4 +1,4 @@
-class Api::V1::RaceTiersController < ApplicationController
+class Api::V1::RaceTiersController < Api::V1::BaseController
   def index
   end
 

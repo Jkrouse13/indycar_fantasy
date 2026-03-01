@@ -1,7 +1,7 @@
-class Api::V1::PicksController < ApplicationController
+class Api::V1::PicksController < Api::V1::BaseController
   def index
     picks = Pick.includes(:participant, :driver, :race_tier).where(race_id: params[:race_id])
-    render json: picks, include: [:participant, :driver, :race_tier]
+    render json: picks, include: [ :participant, :driver, :race_tier ]
   end
 
   def create

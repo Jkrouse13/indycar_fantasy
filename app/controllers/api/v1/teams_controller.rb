@@ -1,4 +1,4 @@
-class Api::V1::TeamsController < ApplicationController
+class Api::V1::TeamsController < Api::V1::BaseController
   def index
     render json: Team.includes(:drivers).all, include: :drivers
   end

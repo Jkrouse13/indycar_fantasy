@@ -1,4 +1,4 @@
-class Api::V1::DriversController < ApplicationController
+class Api::V1::DriversController < Api::V1::BaseController
   def index
     drivers = Driver.includes(:team).all
     render json: drivers, include: :team

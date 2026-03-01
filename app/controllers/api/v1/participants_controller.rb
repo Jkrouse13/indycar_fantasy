@@ -1,4 +1,4 @@
-class Api::V1::ParticipantsController < ApplicationController
+class Api::V1::ParticipantsController < Api::V1::BaseController
   def index
   end
 

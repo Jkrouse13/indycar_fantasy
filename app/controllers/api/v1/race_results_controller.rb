@@ -1,4 +1,4 @@
-class Api::V1::RaceResultsController < ApplicationController
+class Api::V1::RaceResultsController < Api::V1::BaseController
   def index
     results = RaceResult.includes(:driver).where(race_id: params[:race_id])
     render json: results, include: :driver

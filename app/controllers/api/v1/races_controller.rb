@@ -1,4 +1,4 @@
-class Api::V1::RacesController < ApplicationController
+class Api::V1::RacesController < Api::V1::BaseController
   def index
     races = Race.all.order(date: :asc)
     render json: races
