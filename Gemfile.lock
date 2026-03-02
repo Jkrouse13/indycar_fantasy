@@ -455,6 +455,7 @@ DEPENDENCIES
   solid_cable
   solid_cache
   solid_queue
+  sprockets-rails
   thruster
   tzinfo-data
 

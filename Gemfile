@@ -28,6 +28,7 @@ gem "image_processing", "~> 1.2"
 gem "rack-cors"
 gem "rails_admin", "~> 3.0"
 gem "devise"
+gem "sprockets-rails"
 
 group :development do
   gem "pry-rails"
