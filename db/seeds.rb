@@ -52,8 +52,8 @@ Driver.find_or_create_by!(car_number: 19) { |d| d.name = "Dennis Hauger"; d.team
 Driver.find_or_create_by!(car_number: 4)  { |d| d.name = "Caio Collet"; d.team = foyt }
 Driver.find_or_create_by!(car_number: 14) { |d| d.name = "Santino Ferrucci"; d.team = foyt }
 
-Driver.find_or_create_by!(car_number: 77) { |d| d.name = "Rinus VeeKay"; d.team = juncos }
-Driver.find_or_create_by!(car_number: 75) { |d| d.name = "Sting Ray Robb"; d.team = juncos }
+Driver.find_or_create_by!(car_number: 76) { |d| d.name = "Rinus VeeKay"; d.team = juncos }
+Driver.find_or_create_by!(car_number: 77) { |d| d.name = "Sting Ray Robb"; d.team = juncos }
 
 Driver.find_or_create_by!(car_number: 60) { |d| d.name = "Felix Rosenqvist"; d.team = meyer_shank }
 Driver.find_or_create_by!(car_number: 66) { |d| d.name = "Marcus Armstrong"; d.team = meyer_shank }
@@ -95,10 +95,6 @@ puts "Done! #{Team.count} teams, #{Driver.count} drivers, #{Race.count} races se
 
 puts "Seeding St. Petersburg race results..."
 
-# Update car numbers to reflect actual 2026 season
-Driver.find_by(car_number: 75)&.update!(car_number: 999) # temp
-Driver.find_by(car_number: 77)&.update!(car_number: 76)  # VeeKay -> 76
-Driver.find_by(car_number: 999)&.update!(car_number: 77) # Robb -> 77
 
 st_pete = Race.find_by(name: "Firestone Grand Prix of St. Petersburg")
 st_pete.update!(status: :final)
@@ -166,3 +162,101 @@ tiers.each do |tier_number, driver_names|
 end
 
 puts "Done! St. Petersburg tiers seeded."
+
+puts "Seeding St. Pete participants and picks..."
+
+st_pete = Race.find_by(name: "Firestone Grand Prix of St. Petersburg")
+
+participants_data = [
+  { name: "Theo",      email: "theo@krouse.com" },
+  { name: "Lilly",     email: "lilly@krouse.com" },
+  { name: "Pete",      email: "pete@krouse.com" },
+  { name: "Sarah",     email: "sarahszybowski@gmail.com" },
+  { name: "Ellie",     email: "ellie@szybowski.com" },
+  { name: "Eli",       email: "eli@szybowski.com" },
+  { name: "Katie",     email: "kathleen.c.krouse@gmail.com" },
+  { name: "Jacob",     email: "jacob.krouse@gmail.com" },
+  { name: "Uncle Jon", email: "jon.krouse@hey.com" }
+]
+
+picks_data = [
+  { email: "theo@krouse.com",             1 => "Pato",       2 => "Lundgaard", 3 => "Dixon",  4 => "Hauger",  5 => "Rahal",    6 => "Robb" },
+  { email: "lilly@krouse.com",            1 => "Palou",      2 => "Ericsson",  3 => "Dixon",  4 => "Hauger",  5 => "Rahal",    6 => "Robb" },
+  { email: "pete@krouse.com",             1 => "Palou",      2 => "Ericsson",  3 => "Dixon",  4 => "VeeKay",  5 => "Ferrucci", 6 => "Robb" },
+  { email: "sarahszybowski@gmail.com",    1 => "Pato",       2 => "Lundgaard", 3 => "Dixon",  4 => "Hauger",  5 => "Rahal",    6 => "Robb" },
+  { email: "ellie@szybowski.com",         1 => "Pato",       2 => "Lundgaard", 3 => "Dixon",  4 => "Hauger",  5 => "Rahal",    6 => "Robb" },
+  { email: "eli@szybowski.com",           1 => "Palou",      2 => "Lundgaard", 3 => "Dixon",  4 => "Rossi",   5 => "Rahal",    6 => "Robb" },
+  { email: "kathleen.c.krouse@gmail.com", 1 => "McLaughlin", 2 => "Rosenqvist", 3 => "Foster", 4 => "Simpson", 5 => "Ferrucci", 6 => "Schumacher" },
+  { email: "jacob.krouse@gmail.com",      1 => "McLaughlin", 2 => "Ericsson",  3 => "Foster", 4 => "Simpson", 5 => "Rahal",    6 => "Schumacher" },
+  { email: "jon.krouse@hey.com",          1 => "Palou",      2 => "Ericsson",  3 => "Kirkwood", 4 => "Hauger", 5 => "Rahal",    6 => "Schumacher" }
+]
+
+picks_data.each do |data|
+  email = data[:email]
+  person = participants_data.find { |p| p[:email] == email }
+
+  participant = Participant.find_or_create_by!(email: email.downcase) do |p|
+    p.name = person[:name]
+  end
+
+  (1..6).each do |tier_number|
+    identifier = data[tier_number]
+    driver = Driver.find_by("name ILIKE ?", "%#{identifier}%")
+    race_tier = RaceTier.find_by(race: st_pete, tier_number: tier_number)
+
+    if driver && race_tier
+      Pick.find_or_create_by!(
+        participant: participant,
+        race: st_pete,
+        race_tier: race_tier
+      ) do |pick|
+        pick.driver = driver
+      end
+    else
+      puts "WARNING: Could not find driver '#{identifier}' for #{email} tier #{tier_number}"
+    end
+  end
+end
+
+puts "Done! #{Participant.count} participants, #{Pick.count} picks seeded."
+
+puts "Seeding driver car colors..."
+
+car_colors = {
+  2  => { primary: "#C8102E", secondary: "#C0C0C0" },  # Newgarden - red/silver
+  3  => { primary: "#C8102E", secondary: "#FFFFFF" },  # McLaughlin - red/white
+  4  => { primary: "#00843D", secondary: "#FFD100" },  # Collet - green/yellow
+  5  => { primary: "#FF6900", secondary: "#000000" },  # O'Ward - orange/black
+  6  => { primary: "#FF6900", secondary: "#003087" },  # Siegel - orange/blue
+  7  => { primary: "#FF6900", secondary: "#000000" },  # Lundgaard - orange/black
+  8  => { primary: "#003087", secondary: "#FFD100" },  # Simpson - blue/yellow
+  9  => { primary: "#003087", secondary: "#FF6900" },  # Dixon - blue/orange
+  10 => { primary: "#FFD100", secondary: "#C8102E" },  # Palou - yellow/red
+  12 => { primary: "#C8102E", secondary: "#FFFFFF" },  # Malukas - red/white
+  14 => { primary: "#003087", secondary: "#FFFFFF" },  # Ferrucci - blue/white
+  15 => { primary: "#00843D", secondary: "#FFFFFF" },  # Rahal - green/white
+  18 => { primary: "#000000", secondary: "#FF6900" },  # Grosjean - black/orange
+  19 => { primary: "#000000", secondary: "#C8102E" },  # Hauger - black/red
+  20 => { primary: "#00843D", secondary: "#FFFFFF" },  # Rossi - green/white
+  21 => { primary: "#FFFFFF", secondary: "#00843D" },  # Rasmussen - white/green
+  26 => { primary: "#000000", secondary: "#FFD100" },  # Power - black/yellow
+  27 => { primary: "#FFFFFF", secondary: "#003087" },  # Kirkwood - white/blue
+  28 => { primary: "#008080", secondary: "#FFFFFF" },  # Ericsson - teal/white
+  45 => { primary: "#FFFFFF", secondary: "#003087" },  # Foster - white/blue
+  47 => { primary: "#000000", secondary: "#C8102E" },  # Schumacher - black/red
+  60 => { primary: "#000000", secondary: "#C8102E" },  # Rosenqvist - black/red
+  66 => { primary: "#FF6900", secondary: "#000000" },  # Armstrong - orange/black
+  76 => { primary: "#FFFFFF", secondary: "#003087" },  # VeeKay - white/blue
+  77 => { primary: "#C8102E", secondary: "#FFFFFF" }  # Robb - red/white
+}
+
+car_colors.each do |car_number, colors|
+  driver = Driver.find_by(car_number: car_number)
+  if driver
+    driver.update!(primary_color: colors[:primary], secondary_color: colors[:secondary])
+  else
+    puts "WARNING: Driver with car ##{car_number} not found"
+  end
+end
+
+puts "Done! Driver colors seeded."

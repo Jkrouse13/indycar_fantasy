@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_01_213036) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,6 +46,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_01_213036) do
     t.integer "car_number"
     t.datetime "created_at", null: false
     t.string "name"
+    t.string "primary_color"
+    t.string "secondary_color"
     t.bigint "team_id", null: false
     t.datetime "updated_at", null: false
     t.index ["team_id"], name: "index_drivers_on_team_id"

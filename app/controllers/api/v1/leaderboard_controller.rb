@@ -15,8 +15,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
       {
         participant: {
           id: participant.id,
-          name: participant.name,
-          email: participant.email
+          name: participant.name.presence || participant.email
         },
         picks: participant_picks.map do |pick|
           result = results[pick.driver_id]
@@ -25,7 +24,9 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
             driver: {
               id: pick.driver.id,
               name: pick.driver.name,
-              car_number: pick.driver.car_number
+              car_number: pick.driver.car_number,
+              primary_color: pick.driver.primary_color,
+              secondary_color: pick.driver.secondary_color
             },
             finishing_position: result ? result.finishing_position : nil
           }
@@ -93,6 +94,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
           name: data[:name]
         },
         total_score: data[:total_score],
+        best_finish: data[:best_finish],
         races_entered: data[:races_entered]
       }
     end
@@ -113,15 +115,21 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
         result ? result.finishing_position : 0
       end
 
+      best_finish = participant_picks.map do |pick|
+        result = results[[ pick.race_id, pick.driver_id ]]
+        result ? result.finishing_position : 999
+      end.min
+
       [ participant.id, {
-        name: participant.name,
+        name: participant.name.presence || participant.email,
         total_score: total_score,
+        best_finish: best_finish,
         races_entered: participant_picks.map(&:race_id).uniq.count
       } ]
     end.to_h
   end
 
   def rank_participants(scores)
-    scores.sort_by { |_, data| data[:total_score] }.to_h
+    scores.sort_by { |_, data| [ data[:total_score], data[:best_finish] ] }.to_h
   end
 end
