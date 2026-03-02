@@ -87,9 +87,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: krouse_indycar_fantasy_production
-    username: krouse_indycar_fantasy
-    password: <%= ENV["KROUSE_INDYCAR_FANTASY_DATABASE_PASSWORD"] %>
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
     database: krouse_indycar_fantasy_production_cache
