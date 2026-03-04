@@ -9,6 +9,19 @@ RailsAdmin.config do |config|
   end
   config.current_user_method(&:current_user)
 
+  config.model "RaceTier" do
+    edit do
+      field :race
+      field :tier_number
+      field :drivers do
+        associated_collection_cache_all true
+        associated_collection_scope do
+          proc { |scope| scope.order(:car_number) }
+        end
+      end
+    end
+  end
+
   ## == CancanCan ==
   # config.authorize_with :cancancan
 
