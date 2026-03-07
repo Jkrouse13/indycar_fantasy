@@ -25,6 +25,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
               id: pick.driver.id,
               name: pick.driver.name,
               car_number: pick.driver.car_number,
+              team_name: pick.driver.team&.name,
               primary_color: pick.driver.primary_color,
               secondary_color: pick.driver.secondary_color
             },
