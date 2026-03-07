@@ -4,7 +4,35 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
   end
 
   def show
-    render json: Participant.find(params[:id])
+    participant = Participant.find(params[:id])
+    picks = participant.picks.includes(:race, :driver).map do |pick|
+      {
+        id: pick.id,
+        race: {
+          id: pick.race.id,
+          name: pick.race.name,
+          date: pick.race.date,
+          status: pick.race.status
+        },
+        driver: {
+          id: pick.driver.id,
+          name: pick.driver.name,
+          car_number: pick.driver.car_number,
+          primary_color: pick.driver.primary_color,
+          secondary_color: pick.driver.secondary_color
+        },
+        tier: pick.race_tier&.tier_number,
+        finishing_position: pick.finishing_position,
+        points: pick.points
+      }
+    end
+
+    render json: {
+      id: participant.id,
+      name: participant.name,
+      email: participant.email,
+      picks: picks
+    }
   end
 
   def create
