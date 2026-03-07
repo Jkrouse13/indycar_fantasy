@@ -3,39 +3,50 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
     render json: Participant.all
   end
 
-    def show
-      participant = Participant.find(params[:id])
-      picks = participant.picks.includes(:race, :driver, :race_tier).map do |pick|
-        race_result = RaceResult.find_by(race_id: pick.race_id, driver_id: pick.driver_id)
+  def show
+    participant = Participant.find(params[:id])
+    picks = participant.picks.includes(:race, :driver, :race_tier)
+    results = RaceResult.where(race_id: picks.map(&:race_id)).index_by { |r| [ r.race_id, r.driver_id ] }
 
-        {
-          id: pick.id,
-          race: {
-            id: pick.race.id,
-            name: pick.race.name,
-            date: pick.race.date,
-            status: pick.race.status
-          },
-          driver: {
-            id: pick.driver.id,
-            name: pick.driver.name,
-            car_number: pick.driver.car_number,
-            primary_color: pick.driver.primary_color,
-            secondary_color: pick.driver.secondary_color
-          },
-          tier: pick.race_tier&.tier_number,
-          finishing_position: race_result&.finishing_position,
-          points: race_result&.points
-        }
+    picks_by_race = picks.group_by(&:race).map do |race, race_picks|
+      race_total = race_picks.sum do |pick|
+        result = results[[ pick.race_id, pick.driver_id ]]
+        result&.finishing_position || 0
       end
 
-      render json: {
-        id: participant.id,
-        name: participant.name,
-        email: participant.email,
-        picks: picks
+      {
+        race: {
+          id: race.id,
+          name: race.name,
+          date: race.date,
+          status: race.status
+        },
+        total_score: race_total,
+        picks: race_picks.map do |pick|
+          result = results[[ pick.race_id, pick.driver_id ]]
+          {
+            id: pick.id,
+            driver: {
+              id: pick.driver.id,
+              name: pick.driver.name,
+              car_number: pick.driver.car_number,
+              primary_color: pick.driver.primary_color,
+              secondary_color: pick.driver.secondary_color
+            },
+            tier: pick.race_tier&.tier_number,
+            finishing_position: result&.finishing_position
+          }
+        end.sort_by { |p| p[:tier] }
       }
-    end
+    end.sort_by { |r| r[:race][:date] }
+
+    render json: {
+      id: participant.id,
+      name: participant.name,
+      email: participant.email,
+      races: picks_by_race
+    }
+  end
 
   def create
     participant = Participant.find_or_create_by_email(participant_params[:email])
