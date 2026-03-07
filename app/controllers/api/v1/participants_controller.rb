@@ -5,7 +5,7 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
 
   def show
     participant = Participant.find(params[:id])
-    picks = participant.picks.includes(:race, :driver, :race_tier)
+    picks = participant.picks.includes(:race, :race_tier, driver: :team)
     results = RaceResult.where(race_id: picks.map(&:race_id)).index_by { |r| [ r.race_id, r.driver_id ] }
 
     picks_by_race = picks.group_by(&:race).map do |race, race_picks|
@@ -30,6 +30,7 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
               id: pick.driver.id,
               name: pick.driver.name,
               car_number: pick.driver.car_number,
+              team_name: pick.driver.team&.name,
               primary_color: pick.driver.primary_color,
               secondary_color: pick.driver.secondary_color
             },
@@ -38,7 +39,7 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
           }
         end.sort_by { |p| p[:tier] }
       }
-    end.sort_by { |r| r[:race][:date] }
+    end.sort_by { |r| r[:race][:date] }.reverse
 
     render json: {
       id: participant.id,

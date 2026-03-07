@@ -450,6 +450,8 @@ DEPENDENCIES
   rack-cors
   rails (~> 8.1.2)
   rails_admin (~> 3.0)
+  rubocop
+  rubocop-rails
   rubocop-rails-omakase
   sassc-rails
   solid_cable
