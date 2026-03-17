@@ -9,6 +9,10 @@ RailsAdmin.config do |config|
   end
   config.current_user_method(&:current_user)
 
+  config.model "Race" do
+    object_label_method :name
+  end
+
   config.model "RaceTier" do
     edit do
       field :race
@@ -47,6 +51,38 @@ RailsAdmin.config do |config|
     edit
     delete
     show_in_app
+
+    member :bulk_race_results do
+      only ["Race"]
+      http_methods [:get, :post]
+      turbo false
+      link_icon "fas fa-list-ol"
+      controller do
+        proc do
+          @drivers = Driver.order(:car_number)
+          @existing_results = @object.race_results.index_by(&:driver_id)
+
+          if request.post?
+            ActiveRecord::Base.transaction do
+              params[:finishing_positions].each do |driver_id, position|
+                if position.present?
+                  result = @object.race_results.find_or_initialize_by(driver_id: driver_id.to_i)
+                  result.finishing_position = position.to_i
+                  result.save!
+                else
+                  @object.race_results.where(driver_id: driver_id.to_i).destroy_all
+                end
+              end
+            end
+
+            flash[:success] = "Race results saved for #{@object.name}."
+            redirect_to rails_admin.bulk_race_results_path(model_name: "race", id: @object.id)
+          else
+            render :bulk_race_results
+          end
+        end
+      end
+    end
 
     ## With an audit adapter, you can add:
     # history_index

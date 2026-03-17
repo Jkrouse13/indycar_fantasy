@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+  admin:
+    actions:
+      bulk_race_results:
+        breadcrumb: "Enter Results"
+        menu: "Enter Results"
+        title: "Enter Race Results"

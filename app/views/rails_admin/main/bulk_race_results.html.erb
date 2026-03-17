@@ -1,0 +1,37 @@
+<%= rails_admin_form_for @object, url: rails_admin.bulk_race_results_path(model_name: "race", id: @object.id), method: :post do |f| %>
+  <div class="form-group">
+    <h3>Enter finishing positions for: <strong><%= @object.name %></strong></h3>
+    <p class="help-block">Leave a position blank to remove that driver's result.</p>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Driver</th>
+        <th>Finishing Position</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @drivers.each do |driver| %>
+        <tr>
+          <td><%= driver.car_number %></td>
+          <td><%= driver.name %></td>
+          <td>
+            <%= number_field_tag "finishing_positions[#{driver.id}]",
+                @existing_results[driver.id]&.finishing_position,
+                min: 1, max: 33,
+                class: "form-control input-sm",
+                style: "width: 80px;",
+                placeholder: "—" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="form-group">
+    <%= f.submit "Save Results", class: "btn btn-primary" %>
+    <%= link_to "Cancel", rails_admin.show_path(model_name: "race", id: @object.id), class: "btn btn-default" %>
+  </div>
+<% end %>
