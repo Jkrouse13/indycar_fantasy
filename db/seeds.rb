@@ -250,13 +250,13 @@ car_colors = {
   77 => { primary: "#C8102E", secondary: "#FFFFFF" }  # Robb - red/white
 }
 
-car_colors.each do |car_number, colors|
-  driver = Driver.find_by(car_number: car_number)
-  if driver
-    driver.update!(primary_color: colors[:primary], secondary_color: colors[:secondary])
-  else
-    puts "WARNING: Driver with car ##{car_number} not found"
-  end
-end
+# car_colors.each do |car_number, colors|
+#   driver = Driver.find_by(car_number: car_number)
+#   if driver
+#     driver.update!(primary_color: colors[:primary], secondary_color: colors[:secondary])
+#   else
+#     puts "WARNING: Driver with car ##{car_number} not found"
+#   end
+# end
 
 puts "Done! Driver colors seeded."
