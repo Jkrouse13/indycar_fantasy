@@ -20,7 +20,7 @@ RailsAdmin.config do |config|
       field :drivers do
         associated_collection_cache_all true
         associated_collection_scope do
-          proc { |scope| scope.order(:car_number) }
+          proc { |scope| scope.order("car_number::integer") }
         end
       end
     end
@@ -35,11 +35,11 @@ RailsAdmin.config do |config|
       field :finalized
       field :fast_twelve_drivers do
         associated_collection_cache_all true
-        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+        associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end
       field :last_row_drivers do
         associated_collection_cache_all true
-        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+        associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end
     end
   end
@@ -53,11 +53,11 @@ RailsAdmin.config do |config|
       field :sunday_wreck
       field :fast_twelve_drivers do
         associated_collection_cache_all true
-        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+        associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end
       field :last_row_drivers do
         associated_collection_cache_all true
-        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+        associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end
     end
   end

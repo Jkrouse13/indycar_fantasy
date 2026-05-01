@@ -1,6 +1,6 @@
 class Api::V1::DriversController < Api::V1::BaseController
   def index
-    drivers = Driver.includes(:team).all
+    drivers = Driver.includes(:team).order("car_number::integer")
     render json: drivers, include: :team
   end
 
