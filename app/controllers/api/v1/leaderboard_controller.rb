@@ -96,7 +96,9 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
         },
         total_score: data[:total_score],
         best_finish: data[:best_finish],
-        races_entered: data[:races_entered]
+        races_entered: data[:races_entered],
+        missed_races: data[:missed_races],
+        penalty_score: data[:penalty_score]
       }
     end
 
@@ -110,23 +112,42 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
   private
 
   def calculate_scores(picks, results, races)
-    picks.group_by(&:participant).map do |participant, participant_picks|
-      total_score = participant_picks.sum do |pick|
-        result = results[[ pick.race_id, pick.driver_id ]]
-        result ? result.finishing_position : 0
-      end
+    race_ids = races.map(&:id)
 
-      best_finish = participant_picks.map do |pick|
-        result = results[[ pick.race_id, pick.driver_id ]]
-        result ? result.finishing_position : 999
-      end.min
+    # Build race_id → participant_id → score matrix
+    race_scores = race_ids.index_with { {} }
+    picks.each do |pick|
+      next unless race_ids.include?(pick.race_id)
+      pos = results[[pick.race_id, pick.driver_id]]&.finishing_position || 0
+      race_scores[pick.race_id][pick.participant_id] = (race_scores[pick.race_id][pick.participant_id] || 0) + pos
+    end
 
-      [ participant.id, {
-        name: participant.name.presence || participant.email,
-        total_score: total_score,
-        best_finish: best_finish,
-        races_entered: participant_picks.map(&:race_id).uniq.count
-      } ]
+    # Average score per race among participants who picked
+    race_averages = race_ids.to_h do |race_id|
+      scores = race_scores[race_id].values
+      avg = scores.any? ? (scores.sum.to_f / scores.size).round : 0
+      [race_id, avg]
+    end
+
+    picks.group_by(&:participant).map do |participant, p_picks|
+      entered = p_picks.map(&:race_id).uniq & race_ids
+      missed  = race_ids - entered
+
+      actual  = entered.sum { |rid| race_scores[rid][participant.id] || 0 }
+      penalty = missed.sum  { |rid| race_averages[rid] }
+
+      best_finish = p_picks.filter_map { |pk|
+        results[[pk.race_id, pk.driver_id]]&.finishing_position
+      }.min || 999
+
+      [participant.id, {
+        name:          participant.name.presence || participant.email,
+        total_score:   actual + penalty,
+        best_finish:   best_finish,
+        races_entered: entered.size,
+        missed_races:  missed.size,
+        penalty_score: penalty
+      }]
     end.to_h
   end
 
