@@ -26,6 +26,42 @@ RailsAdmin.config do |config|
     end
   end
 
+  config.model "QualifyingResult" do
+    edit do
+      field :year
+      field :pole_driver
+      field :saturday_wreck
+      field :sunday_wreck
+      field :finalized
+      field :fast_twelve_drivers do
+        associated_collection_cache_all true
+        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+      end
+      field :last_row_drivers do
+        associated_collection_cache_all true
+        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+      end
+    end
+  end
+
+  config.model "QualifyingPrediction" do
+    edit do
+      field :participant
+      field :year
+      field :pole_pick
+      field :saturday_wreck
+      field :sunday_wreck
+      field :fast_twelve_drivers do
+        associated_collection_cache_all true
+        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+      end
+      field :last_row_drivers do
+        associated_collection_cache_all true
+        associated_collection_scope { proc { |scope| scope.order(:car_number) } }
+      end
+    end
+  end
+
   ## == CancanCan ==
   # config.authorize_with :cancancan
 

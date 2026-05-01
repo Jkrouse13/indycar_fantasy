@@ -4,6 +4,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resources :qualifying_predictions, only: [:index, :show, :create, :update]
+      resources :qualifying_results, only: [:show, :update], param: :year
       resources :races do
         resources :race_tiers, shallow: true
         resources :race_results, shallow: true

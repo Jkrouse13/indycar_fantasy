@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,7 +43,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
   end
 
   create_table "drivers", force: :cascade do |t|
-    t.integer "car_number"
+    t.boolean "active", default: true, null: false
+    t.string "car_number"
     t.datetime "created_at", null: false
     t.string "name"
     t.string "primary_color"
@@ -51,6 +52,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
     t.bigint "team_id", null: false
     t.datetime "updated_at", null: false
     t.index ["team_id"], name: "index_drivers_on_team_id"
+  end
+
+  create_table "fast_twelve_picks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driver_id", null: false
+    t.bigint "qualifying_prediction_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_fast_twelve_picks_on_driver_id"
+    t.index ["qualifying_prediction_id", "driver_id"], name: "idx_on_qualifying_prediction_id_driver_id_45ceb850c4", unique: true
+    t.index ["qualifying_prediction_id"], name: "index_fast_twelve_picks_on_qualifying_prediction_id"
+  end
+
+  create_table "last_row_picks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driver_id", null: false
+    t.bigint "qualifying_prediction_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_last_row_picks_on_driver_id"
+    t.index ["qualifying_prediction_id", "driver_id"], name: "index_last_row_picks_on_qualifying_prediction_id_and_driver_id", unique: true
+    t.index ["qualifying_prediction_id"], name: "index_last_row_picks_on_qualifying_prediction_id"
   end
 
   create_table "participants", force: :cascade do |t|
@@ -71,6 +92,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
     t.index ["participant_id"], name: "index_picks_on_participant_id"
     t.index ["race_id"], name: "index_picks_on_race_id"
     t.index ["race_tier_id"], name: "index_picks_on_race_tier_id"
+  end
+
+  create_table "qualifying_predictions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "participant_id", null: false
+    t.bigint "pole_pick_driver_id"
+    t.boolean "saturday_wreck", default: false, null: false
+    t.boolean "sunday_wreck", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["participant_id", "year"], name: "index_qualifying_predictions_on_participant_id_and_year", unique: true
+    t.index ["participant_id"], name: "index_qualifying_predictions_on_participant_id"
+    t.index ["pole_pick_driver_id"], name: "index_qualifying_predictions_on_pole_pick_driver_id"
+  end
+
+  create_table "qualifying_results", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "finalized", default: false, null: false
+    t.bigint "pole_driver_id"
+    t.boolean "saturday_wreck", default: false, null: false
+    t.boolean "sunday_wreck", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["pole_driver_id"], name: "index_qualifying_results_on_pole_driver_id"
+    t.index ["year"], name: "index_qualifying_results_on_year", unique: true
   end
 
   create_table "race_results", force: :cascade do |t|
@@ -100,6 +146,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
     t.integer "status"
     t.string "track"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "result_fast_twelves", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driver_id", null: false
+    t.bigint "qualifying_result_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_result_fast_twelves_on_driver_id"
+    t.index ["qualifying_result_id", "driver_id"], name: "idx_on_qualifying_result_id_driver_id_621dc88fb7", unique: true
+    t.index ["qualifying_result_id"], name: "index_result_fast_twelves_on_qualifying_result_id"
+  end
+
+  create_table "result_last_rows", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driver_id", null: false
+    t.bigint "qualifying_result_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_result_last_rows_on_driver_id"
+    t.index ["qualifying_result_id", "driver_id"], name: "index_result_last_rows_on_qualifying_result_id_and_driver_id", unique: true
+    t.index ["qualifying_result_id"], name: "index_result_last_rows_on_qualifying_result_id"
   end
 
   create_table "teams", force: :cascade do |t|
@@ -132,13 +198,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_02_013810) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "drivers", "teams"
+  add_foreign_key "fast_twelve_picks", "drivers"
+  add_foreign_key "fast_twelve_picks", "qualifying_predictions"
+  add_foreign_key "last_row_picks", "drivers"
+  add_foreign_key "last_row_picks", "qualifying_predictions"
   add_foreign_key "picks", "drivers"
   add_foreign_key "picks", "participants"
   add_foreign_key "picks", "race_tiers"
   add_foreign_key "picks", "races"
+  add_foreign_key "qualifying_predictions", "drivers", column: "pole_pick_driver_id"
+  add_foreign_key "qualifying_predictions", "participants"
+  add_foreign_key "qualifying_results", "drivers", column: "pole_driver_id"
   add_foreign_key "race_results", "drivers"
   add_foreign_key "race_results", "races"
   add_foreign_key "race_tiers", "races"
+  add_foreign_key "result_fast_twelves", "drivers"
+  add_foreign_key "result_fast_twelves", "qualifying_results"
+  add_foreign_key "result_last_rows", "drivers"
+  add_foreign_key "result_last_rows", "qualifying_results"
   add_foreign_key "tier_drivers", "drivers"
   add_foreign_key "tier_drivers", "race_tiers"
 end

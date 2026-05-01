@@ -128,7 +128,7 @@ st_pete_results = [
 ]
 
 st_pete_results.each do |r|
-  driver = Driver.find_by(car_number: r[:car])
+  driver = Driver.find_by(car_number: r[:car].to_s)
   RaceResult.find_or_create_by!(race: st_pete, driver: driver) do |result|
     result.finishing_position = r[:pos]
   end
@@ -260,3 +260,21 @@ car_colors = {
 # end
 
 puts "Done! Driver colors seeded."
+
+puts "Seeding Indy 500-only entries..."
+
+# Additional teams for Indy 500 one-off entries
+drr        = Team.find_or_create_by!(name: "Dreyer & Reinbold Racing")
+abel       = Team.find_or_create_by!(name: "Abel Motorsports")
+
+Driver.find_or_create_by!(car_number: "06") { |d| d.name = "Hélio Castroneves"; d.team = meyer_shank; d.active = true }
+
+Driver.find_or_create_by!(car_number: 11) { |d| d.name = "Katherine Legge";  d.team = foyt;        d.active = true }
+Driver.find_or_create_by!(car_number: 23) { |d| d.name = "Conor Daly";        d.team = drr;         d.active = true }
+Driver.find_or_create_by!(car_number: 24) { |d| d.name = "Jack Harvey";       d.team = drr;         d.active = true }
+Driver.find_or_create_by!(car_number: 31) { |d| d.name = "Ryan Hunter-Reay";  d.team = arrow_mclaren; d.active = true }
+Driver.find_or_create_by!(car_number: 33) { |d| d.name = "Ed Carpenter";      d.team = ecr;         d.active = true }
+Driver.find_or_create_by!(car_number: 51) { |d| d.name = "Jacob Abel";        d.team = abel;        d.active = true }
+Driver.find_or_create_by!(car_number: 75) { |d| d.name = "Takuma Sato";       d.team = rahal;       d.active = true }
+
+puts "Done! #{Driver.count} total drivers."
