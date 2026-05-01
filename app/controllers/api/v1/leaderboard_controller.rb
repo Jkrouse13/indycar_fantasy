@@ -136,9 +136,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
       actual  = entered.sum { |rid| race_scores[rid][participant.id] || 0 }
       penalty = missed.sum  { |rid| race_averages[rid] }
 
-      best_finish = p_picks.filter_map { |pk|
-        results[[pk.race_id, pk.driver_id]]&.finishing_position
-      }.min || 999
+      best_finish = entered.map { |rid| race_scores[rid][participant.id] || 0 }.min || 999
 
       [participant.id, {
         name:          participant.name.presence || participant.email,
