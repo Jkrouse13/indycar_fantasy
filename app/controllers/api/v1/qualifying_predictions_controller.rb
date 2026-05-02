@@ -2,7 +2,7 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
   def index
     year = params.fetch(:year, 2026).to_i
     predictions = QualifyingPrediction
-      .includes(:participant, :pole_pick, :fast_twelve_drivers, :last_row_drivers)
+      .includes(:participant, :fast_twelve_picks, :last_row_picks)
       .where(year: year)
 
     result = QualifyingResult.find_by(year: year)
@@ -12,7 +12,7 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
 
   def show
     prediction = QualifyingPrediction
-      .includes(:participant, :pole_pick, :fast_twelve_drivers, :last_row_drivers)
+      .includes(:participant, :fast_twelve_picks, :last_row_picks)
       .find_by!(participant_id: params[:id], year: params.fetch(:year, 2026).to_i)
 
     result = QualifyingResult.find_by(year: prediction.year)
@@ -62,7 +62,7 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
 
   def base_params
     params.require(:qualifying_prediction).permit(
-      :participant_id, :year, :pole_pick_driver_id, :saturday_wreck, :sunday_wreck
+      :participant_id, :year, :saturday_wreck, :sunday_wreck
     )
   end
 
@@ -94,8 +94,6 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
       participant_id: prediction.participant_id,
       participant_name: prediction.participant&.name,
       year: prediction.year,
-      pole_pick_driver_id: prediction.pole_pick_driver_id,
-      pole_pick_name: prediction.pole_pick&.name,
       saturday_wreck: prediction.saturday_wreck,
       sunday_wreck: prediction.sunday_wreck,
       fast_twelve_driver_ids: prediction.fast_twelve_picks.order(:position).pluck(:driver_id),

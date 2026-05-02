@@ -3,7 +3,6 @@ class QualifyingPrediction < ApplicationRecord
   include QualifyingScoring
 
   belongs_to :participant
-  belongs_to :pole_pick, class_name: "Driver", foreign_key: :pole_pick_driver_id, optional: true
 
   has_many :fast_twelve_picks, dependent: :destroy
   has_many :fast_twelve_drivers, through: :fast_twelve_picks, source: :driver
@@ -16,7 +15,6 @@ class QualifyingPrediction < ApplicationRecord
   validate :fast_twelve_count
   validate :last_row_count
   validate :no_overlap_between_sets
-  validate :pole_pick_in_fast_twelve
 
   LOCKOUT_TIMES = {
     2026 => Time.find_zone("Eastern Time (US & Canada)").parse("2026-05-16 11:00:00")
@@ -33,24 +31,32 @@ class QualifyingPrediction < ApplicationRecord
     saturday_done = result.fast_twelve_drivers.any?
     sunday_done = result.pole_driver_id.present?
 
-    my_ft  = fast_twelve_picks.each_with_object({}) { |p, h| h[p.position] = p.driver_id if p.position }
-    my_lr  = last_row_picks.each_with_object({})   { |p, h| h[p.position] = p.driver_id if p.position }
-    res_ft = result.result_fast_twelves.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
-    res_lr = result.result_last_rows.each_with_object({})    { |r, h| h[r.position] = r.driver_id if r.position }
+    my_ft_by_pos  = fast_twelve_picks.each_with_object({}) { |p, h| h[p.position] = p.driver_id if p.position }
+    my_lr_by_pos  = last_row_picks.each_with_object({})   { |p, h| h[p.position] = p.driver_id if p.position }
+    res_ft_set    = result.result_fast_twelves.map(&:driver_id).to_set
+    res_ft_by_pos = result.result_fast_twelves.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
+    res_lr_set    = result.result_last_rows.map(&:driver_id).to_set
+    res_lr_by_pos = result.result_last_rows.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
 
-    ft_points = saturday_done ? my_ft.count { |pos, id| res_ft[pos] == id } * POINTS[:fast_twelve_per_driver] : nil
-    lr_points = saturday_done ? my_lr.count { |pos, id| res_lr[pos] == id } * POINTS[:last_row_per_driver] : nil
+    ft_points = saturday_done ? my_ft_by_pos.sum { |pos, id|
+      (res_ft_set.include?(id) ? POINTS[:fast_twelve_per_driver] : 0) +
+      (res_ft_by_pos[pos] == id ? POINTS[:position_bonus] : 0)
+    } : nil
+
+    lr_points = saturday_done ? my_lr_by_pos.sum { |pos, id|
+      (res_lr_set.include?(id) ? POINTS[:last_row_per_driver] : 0) +
+      (res_lr_by_pos[pos] == id ? POINTS[:position_bonus] : 0)
+    } : nil
+
     sat_points = saturday_done ? (saturday_wreck == result.saturday_wreck ? POINTS[:saturday_wreck] : 0) : nil
-    pole_points = sunday_done ? (pole_pick_driver_id == result.pole_driver_id ? POINTS[:pole] : 0) : nil
     sun_points = sunday_done ? (sunday_wreck == result.sunday_wreck ? POINTS[:sunday_wreck] : 0) : nil
 
-    scored = [ft_points, lr_points, sat_points, pole_points, sun_points].compact.sum
+    scored = [ft_points, lr_points, sat_points, sun_points].compact.sum
 
     {
       fast_twelve: ft_points,
       last_row: lr_points,
       saturday_wreck: sat_points,
-      pole: pole_points,
       sunday_wreck: sun_points,
       total: scored,
       saturday_done: saturday_done,
@@ -61,7 +67,7 @@ class QualifyingPrediction < ApplicationRecord
   private
 
   def zero_score
-    { fast_twelve: 0, last_row: 0, pole: 0, saturday_wreck: 0, sunday_wreck: 0, total: 0 }
+    { fast_twelve: 0, last_row: 0, saturday_wreck: 0, sunday_wreck: 0, total: 0 }
   end
 
   def fast_twelve_count
@@ -76,11 +82,5 @@ class QualifyingPrediction < ApplicationRecord
     ft_ids = fast_twelve_picks.map(&:driver_id).map(&:to_i)
     lr_ids = last_row_picks.map(&:driver_id).map(&:to_i)
     errors.add(:base, "A driver cannot be in both Fast 12 and Last Row") if (ft_ids & lr_ids).any?
-  end
-
-  def pole_pick_in_fast_twelve
-    return if pole_pick_driver_id.nil?
-    ft_ids = fast_twelve_picks.map(&:driver_id).map(&:to_i)
-    errors.add(:pole_pick, "must be one of your Fast 12 picks") unless ft_ids.include?(pole_pick_driver_id.to_i)
   end
 end
