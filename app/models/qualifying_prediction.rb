@@ -35,6 +35,7 @@ class QualifyingPrediction < ApplicationRecord
     my_lr_by_pos  = last_row_picks.each_with_object({})   { |p, h| h[p.position] = p.driver_id if p.position }
     res_ft_set    = result.result_fast_twelves.map(&:driver_id).to_set
     res_ft_by_pos = result.result_fast_twelves.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
+    res_ft_by_pos[1] ||= result.pole_driver_id if result.pole_driver_id.present?
     res_lr_set    = result.result_last_rows.map(&:driver_id).to_set
     res_lr_by_pos = result.result_last_rows.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
 
