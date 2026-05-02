@@ -40,15 +40,15 @@ class Api::V1::QualifyingResultsController < Api::V1::BaseController
 
   def replace_fast_twelve(result)
     result.result_fast_twelves.destroy_all
-    fast_twelve_ids.each do |driver_id|
-      result.result_fast_twelves.create!(driver_id: driver_id)
+    fast_twelve_ids.each_with_index do |driver_id, i|
+      result.result_fast_twelves.create!(driver_id: driver_id, position: i + 1)
     end
   end
 
   def replace_last_row(result)
     result.result_last_rows.destroy_all
-    last_row_ids.each do |driver_id|
-      result.result_last_rows.create!(driver_id: driver_id)
+    last_row_ids.each_with_index do |driver_id, i|
+      result.result_last_rows.create!(driver_id: driver_id, position: i + 1)
     end
   end
 
@@ -61,8 +61,8 @@ class Api::V1::QualifyingResultsController < Api::V1::BaseController
       saturday_wreck: result.saturday_wreck,
       sunday_wreck: result.sunday_wreck,
       finalized: result.finalized,
-      fast_twelve_driver_ids: result.fast_twelve_drivers.pluck(:id),
-      last_row_driver_ids: result.last_row_drivers.pluck(:id)
+      fast_twelve_driver_ids: result.result_fast_twelves.order(:position).pluck(:driver_id),
+      last_row_driver_ids: result.result_last_rows.order(:position).pluck(:driver_id)
     }
   end
 end

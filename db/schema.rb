@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_02_141428) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
   create_table "fast_twelve_picks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "driver_id", null: false
+    t.integer "position"
     t.bigint "qualifying_prediction_id", null: false
     t.datetime "updated_at", null: false
     t.index ["driver_id"], name: "index_fast_twelve_picks_on_driver_id"
@@ -67,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
   create_table "last_row_picks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "driver_id", null: false
+    t.integer "position"
     t.bigint "qualifying_prediction_id", null: false
     t.datetime "updated_at", null: false
     t.index ["driver_id"], name: "index_last_row_picks_on_driver_id"
@@ -151,6 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
   create_table "result_fast_twelves", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "driver_id", null: false
+    t.integer "position"
     t.bigint "qualifying_result_id", null: false
     t.datetime "updated_at", null: false
     t.index ["driver_id"], name: "index_result_fast_twelves_on_driver_id"
@@ -161,6 +164,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_022516) do
   create_table "result_last_rows", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "driver_id", null: false
+    t.integer "position"
     t.bigint "qualifying_result_id", null: false
     t.datetime "updated_at", null: false
     t.index ["driver_id"], name: "index_result_last_rows_on_driver_id"

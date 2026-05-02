@@ -33,11 +33,13 @@ class QualifyingPrediction < ApplicationRecord
     saturday_done = result.fast_twelve_drivers.any?
     sunday_done = result.pole_driver_id.present?
 
-    my_fast_twelve = fast_twelve_drivers.pluck(:id).to_set
-    my_last_row = last_row_drivers.pluck(:id).to_set
+    my_ft  = fast_twelve_picks.each_with_object({}) { |p, h| h[p.position] = p.driver_id if p.position }
+    my_lr  = last_row_picks.each_with_object({})   { |p, h| h[p.position] = p.driver_id if p.position }
+    res_ft = result.result_fast_twelves.each_with_object({}) { |r, h| h[r.position] = r.driver_id if r.position }
+    res_lr = result.result_last_rows.each_with_object({})    { |r, h| h[r.position] = r.driver_id if r.position }
 
-    ft_points = saturday_done ? (my_fast_twelve & result.fast_twelve_drivers.pluck(:id).to_set).size * POINTS[:fast_twelve_per_driver] : nil
-    lr_points = saturday_done ? (my_last_row & result.last_row_drivers.pluck(:id).to_set).size * POINTS[:last_row_per_driver] : nil
+    ft_points = saturday_done ? my_ft.count { |pos, id| res_ft[pos] == id } * POINTS[:fast_twelve_per_driver] : nil
+    lr_points = saturday_done ? my_lr.count { |pos, id| res_lr[pos] == id } * POINTS[:last_row_per_driver] : nil
     sat_points = saturday_done ? (saturday_wreck == result.saturday_wreck ? POINTS[:saturday_wreck] : 0) : nil
     pole_points = sunday_done ? (pole_pick_driver_id == result.pole_driver_id ? POINTS[:pole] : 0) : nil
     sun_points = sunday_done ? (sunday_wreck == result.sunday_wreck ? POINTS[:sunday_wreck] : 0) : nil

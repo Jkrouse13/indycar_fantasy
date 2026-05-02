@@ -27,8 +27,8 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
       return
     end
 
-    fast_twelve_ids.each { |id| prediction.fast_twelve_picks.build(driver_id: id) }
-    last_row_ids.each    { |id| prediction.last_row_picks.build(driver_id: id) }
+    fast_twelve_ids.each_with_index { |id, i| prediction.fast_twelve_picks.build(driver_id: id, position: i + 1) }
+    last_row_ids.each_with_index    { |id, i| prediction.last_row_picks.build(driver_id: id, position: i + 1) }
 
     if prediction.save
       render json: serialize(prediction), status: :created
@@ -48,8 +48,8 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
     QualifyingPrediction.transaction do
       prediction.fast_twelve_picks.destroy_all
       prediction.last_row_picks.destroy_all
-      fast_twelve_ids.each { |id| prediction.fast_twelve_picks.build(driver_id: id) }
-      last_row_ids.each    { |id| prediction.last_row_picks.build(driver_id: id) }
+      fast_twelve_ids.each_with_index { |id, i| prediction.fast_twelve_picks.build(driver_id: id, position: i + 1) }
+      last_row_ids.each_with_index    { |id, i| prediction.last_row_picks.build(driver_id: id, position: i + 1) }
       prediction.update!(base_params)
     end
 
@@ -98,8 +98,8 @@ class Api::V1::QualifyingPredictionsController < Api::V1::BaseController
       pole_pick_name: prediction.pole_pick&.name,
       saturday_wreck: prediction.saturday_wreck,
       sunday_wreck: prediction.sunday_wreck,
-      fast_twelve_driver_ids: prediction.fast_twelve_drivers.pluck(:id),
-      last_row_driver_ids: prediction.last_row_drivers.pluck(:id),
+      fast_twelve_driver_ids: prediction.fast_twelve_picks.order(:position).pluck(:driver_id),
+      last_row_driver_ids: prediction.last_row_picks.order(:position).pluck(:driver_id),
       locked: prediction.picks_locked?
     }
   end
