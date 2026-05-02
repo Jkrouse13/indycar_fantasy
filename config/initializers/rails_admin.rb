@@ -88,6 +88,41 @@ RailsAdmin.config do |config|
     delete
     show_in_app
 
+    member :ordered_qualifying_results do
+      only ["QualifyingResult"]
+      http_methods [:get, :post]
+      turbo false
+      link_icon "fas fa-flag-checkered"
+      controller do
+        proc do
+          @drivers = Driver.order("car_number::integer")
+          @existing_ft = @object.result_fast_twelves.order(:position).index_by(&:position)
+          @existing_lr = @object.result_last_rows.order(:position).index_by(&:position)
+
+          if request.post?
+            ActiveRecord::Base.transaction do
+              @object.result_fast_twelves.destroy_all
+              params[:fast_twelve_positions].each do |pos, driver_id|
+                next unless driver_id.present?
+                @object.result_fast_twelves.create!(driver_id: driver_id.to_i, position: pos.to_i)
+              end
+
+              @object.result_last_rows.destroy_all
+              params[:last_row_positions].each do |pos, driver_id|
+                next unless driver_id.present?
+                @object.result_last_rows.create!(driver_id: driver_id.to_i, position: pos.to_i)
+              end
+            end
+
+            flash[:success] = "Qualifying order saved for #{@object.year}."
+            redirect_to rails_admin.ordered_qualifying_results_path(model_name: "qualifying_result", id: @object.id)
+          else
+            render :ordered_qualifying_results
+          end
+        end
+      end
+    end
+
     member :bulk_race_results do
       only ["Race"]
       http_methods [:get, :post]

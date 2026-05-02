@@ -1,0 +1,73 @@
+<%= rails_admin_form_for @object, url: rails_admin.ordered_qualifying_results_path(model_name: "qualifying_result", id: @object.id), method: :post do |f| %>
+  <div class="form-group">
+    <h3>Qualifying Order — <strong><%= @object.year %> Indy 500</strong></h3>
+    <p class="help-block">Select the driver for each starting position. Leave blank to clear a slot.</p>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-7">
+      <h4>Fast 12 (P1–P12)</h4>
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th style="width: 60px;">Start</th>
+            <th>Driver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (1..12).each do |pos| %>
+            <tr>
+              <td><strong>P<%= pos %></strong></td>
+              <td>
+                <%= select_tag "fast_twelve_positions[#{pos}]",
+                    options_from_collection_for_select(
+                      @drivers,
+                      :id,
+                      ->(d) { "##{d.car_number} #{d.name}" },
+                      @existing_ft[pos]&.driver_id
+                    ),
+                    include_blank: "— select driver —",
+                    class: "form-control" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-5">
+      <h4>Last Row (P31–P33)</h4>
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th style="width: 60px;">Start</th>
+            <th>Driver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (1..3).each do |pos| %>
+            <tr>
+              <td><strong>P<%= 30 + pos %></strong></td>
+              <td>
+                <%= select_tag "last_row_positions[#{pos}]",
+                    options_from_collection_for_select(
+                      @drivers,
+                      :id,
+                      ->(d) { "##{d.car_number} #{d.name}" },
+                      @existing_lr[pos]&.driver_id
+                    ),
+                    include_blank: "— select driver —",
+                    class: "form-control" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.submit "Save Qualifying Order", class: "btn btn-primary" %>
+    <%= link_to "Cancel", rails_admin.show_path(model_name: "qualifying_result", id: @object.id), class: "btn btn-default" %>
+  </div>
+<% end %>
