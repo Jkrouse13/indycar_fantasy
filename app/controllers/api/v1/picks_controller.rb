@@ -11,9 +11,16 @@ class Api::V1::PicksController < Api::V1::BaseController
       return
     end
 
-    pick = Pick.new(pick_params)
+    pick = Pick.find_or_initialize_by(
+      participant_id: pick_params[:participant_id],
+      race_id: pick_params[:race_id],
+      race_tier_id: pick_params[:race_tier_id]
+    )
+    pick.driver_id = pick_params[:driver_id]
+
     if pick.save
-      render json: pick, status: :created
+      status = pick.previously_new_record? ? :created : :ok
+      render json: pick, status: status
     else
       render json: pick.errors, status: :unprocessable_entity
     end
