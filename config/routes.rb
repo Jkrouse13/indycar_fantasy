@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       resources :teams
       resources :picks
       resources :participants
+      resources :pool_entries
       resources :race_tiers
       get "leaderboard/race/:race_id", to: "leaderboard#race"
       get "leaderboard/season/:season_year", to: "leaderboard#season"

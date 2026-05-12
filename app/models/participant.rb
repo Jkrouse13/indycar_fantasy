@@ -1,5 +1,6 @@
 class Participant < ApplicationRecord
   has_many :picks
+  has_many :pool_entries
   before_validation :normalize_email
 
   def self.find_or_create_by_email(email)
