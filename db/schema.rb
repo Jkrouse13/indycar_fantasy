@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_023135) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_220238) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -127,7 +127,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_023135) do
     t.boolean "finalized", default: false, null: false
     t.bigint "pole_driver_id"
     t.boolean "saturday_wreck", default: false, null: false
+    t.boolean "saturday_wreck_cancelled", default: false, null: false
     t.boolean "sunday_wreck", default: false, null: false
+    t.boolean "sunday_wreck_cancelled", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "year", null: false
     t.index ["pole_driver_id"], name: "index_qualifying_results_on_pole_driver_id"

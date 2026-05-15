@@ -49,8 +49,8 @@ class QualifyingPrediction < ApplicationRecord
       (res_lr_by_pos[pos] == id ? POINTS[:position_bonus] : 0)
     } : nil
 
-    sat_points = saturday_done ? (saturday_wreck == result.saturday_wreck ? POINTS[:saturday_wreck] : 0) : nil
-    sun_points = sunday_done ? (sunday_wreck == result.sunday_wreck ? POINTS[:sunday_wreck] : 0) : nil
+    sat_points = (saturday_done && !result.saturday_wreck_cancelled?) ? (saturday_wreck == result.saturday_wreck ? POINTS[:saturday_wreck] : 0) : nil
+    sun_points = (sunday_done && !result.sunday_wreck_cancelled?) ? (sunday_wreck == result.sunday_wreck ? POINTS[:sunday_wreck] : 0) : nil
 
     scored = [ft_points, lr_points, sat_points, sun_points].compact.sum
 

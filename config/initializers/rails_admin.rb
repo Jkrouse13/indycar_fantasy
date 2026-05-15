@@ -31,7 +31,9 @@ RailsAdmin.config do |config|
       field :year
       field :pole_driver
       field :saturday_wreck
+      field :saturday_wreck_cancelled
       field :sunday_wreck
+      field :sunday_wreck_cancelled
       field :finalized
       field :fast_twelve_drivers do
         associated_collection_cache_all true
