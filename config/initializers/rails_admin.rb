@@ -50,14 +50,15 @@ RailsAdmin.config do |config|
     edit do
       field :participant
       field :year
-      field :pole_pick
       field :saturday_wreck
       field :sunday_wreck
       field :fast_twelve_drivers do
+        read_only true
         associated_collection_cache_all true
         associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end
       field :last_row_drivers do
+        read_only true
         associated_collection_cache_all true
         associated_collection_scope { proc { |scope| scope.order("car_number::integer") } }
       end

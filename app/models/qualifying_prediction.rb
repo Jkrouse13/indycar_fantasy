@@ -17,7 +17,7 @@ class QualifyingPrediction < ApplicationRecord
   validate :no_overlap_between_sets
 
   LOCKOUT_TIMES = {
-    2026 => Time.find_zone("Eastern Time (US & Canada)").parse("2026-05-16 11:00:00")
+    2026 => Time.find_zone("Eastern Time (US & Canada)").parse("2026-05-16 15:00:00")
   }.freeze
 
   def picks_locked?
@@ -41,7 +41,7 @@ class QualifyingPrediction < ApplicationRecord
 
     ft_points = saturday_done ? my_ft_by_pos.sum { |pos, id|
       (res_ft_set.include?(id) ? POINTS[:fast_twelve_per_driver] : 0) +
-      (res_ft_by_pos[pos] == id ? POINTS[:position_bonus] : 0)
+      (res_ft_by_pos[pos] == id ? (pos == 1 ? POINTS[:pole_bonus] : POINTS[:position_bonus]) : 0)
     } : nil
 
     lr_points = saturday_done ? my_lr_by_pos.sum { |pos, id|
