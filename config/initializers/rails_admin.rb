@@ -126,6 +126,31 @@ RailsAdmin.config do |config|
       end
     end
 
+    collection :import_latest_results do
+      only ["Race"]
+      http_methods [:get, :post]
+      turbo false
+      link_icon "fas fa-cloud-download-alt"
+      controller do
+        proc do
+          importer = SportsDbImporter.new
+          @preview = importer.preview
+
+          if request.post?
+            if @preview[:match]
+              count, skipped = importer.import!(@preview[:db_race], @preview[:parsed_rows])
+              flash[:success] = "Imported #{count} results for #{@preview[:db_race].name}. #{skipped} driver(s) not found in DB."
+            else
+              flash[:error] = "Races do not match — no import performed."
+            end
+            redirect_to rails_admin.index_path(model_name: "race")
+          else
+            render :import_latest_results
+          end
+        end
+      end
+    end
+
     member :bulk_race_results do
       only ["Race"]
       http_methods [:get, :post]

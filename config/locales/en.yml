@@ -35,3 +35,7 @@ en:
         breadcrumb: "Enter Results"
         menu: "Enter Results"
         title: "Enter Race Results"
+      import_latest_results:
+        breadcrumb: "Import Latest Results"
+        menu: "Import Latest Results"
+        title: "Import Latest Results"
