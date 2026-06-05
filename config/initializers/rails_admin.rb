@@ -13,6 +13,17 @@ RailsAdmin.config do |config|
     object_label_method :name
   end
 
+  config.model "Driver" do
+    list do
+      field :car_number do
+        sortable :car_number_int
+      end
+      field :name
+      field :team
+      field :active
+    end
+  end
+
   config.model "RaceTier" do
     edit do
       field :race

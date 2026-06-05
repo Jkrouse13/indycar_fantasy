@@ -8,7 +8,7 @@ class Api::V1::RaceTiersController < Api::V1::BaseController
       {
         id: tier.id,
         tier_number: tier.tier_number,
-        drivers: tier.drivers.map { |driver|
+        drivers: tier.drivers.sort_by { |d| d.car_number.to_i }.map { |driver|
           {
             id: driver.id,
             name: driver.name,
@@ -20,5 +20,24 @@ class Api::V1::RaceTiersController < Api::V1::BaseController
         }
       }
     }
+  end
+
+  def create
+    race = Race.find(params[:race_id])
+    tier = race.race_tiers.build(tier_number: params.dig(:race_tier, :tier_number))
+    tier.driver_ids = Array(params.dig(:race_tier, :driver_ids))
+    tier.save!
+    render json: { id: tier.id, tier_number: tier.tier_number }, status: :created
+  end
+
+  def update
+    tier = RaceTier.find(params[:id])
+    tier.driver_ids = Array(params.dig(:race_tier, :driver_ids))
+    render json: { id: tier.id }, status: :ok
+  end
+
+  def destroy
+    RaceTier.find(params[:id]).destroy!
+    head :no_content
   end
 end
