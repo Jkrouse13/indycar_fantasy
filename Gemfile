@@ -30,6 +30,7 @@ gem "rails_admin", "~> 3.0"
 gem "sassc-rails"
 gem "devise"
 gem "sprockets-rails"
+gem "pdf-reader"
 
 group :development do
   gem "pry-rails"
