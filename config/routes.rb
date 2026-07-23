@@ -20,6 +20,9 @@ Rails.application.routes.draw do
       get "leaderboard/season/:season_year", to: "leaderboard#season"
       post "import_results/parse",   to: "import_results#parse"
       post "import_results/confirm", to: "import_results#confirm"
+      get  "races/:race_id/car_liveries", to: "car_liveries#index"
+      post "car_liveries/parse",   to: "car_liveries#parse"
+      post "car_liveries/confirm", to: "car_liveries#confirm"
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_05_190419) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_011824) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,6 +137,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_190419) do
     t.index ["year"], name: "index_qualifying_results_on_year", unique: true
   end
 
+  create_table "race_car_liveries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driver_id", null: false
+    t.string "image_url"
+    t.string "primary_color"
+    t.bigint "race_id", null: false
+    t.string "secondary_color"
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_race_car_liveries_on_driver_id"
+    t.index ["race_id", "driver_id"], name: "index_race_car_liveries_on_race_id_and_driver_id", unique: true
+    t.index ["race_id"], name: "index_race_car_liveries_on_race_id"
+  end
+
   create_table "race_results", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "driver_id", null: false
@@ -231,6 +244,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_190419) do
   add_foreign_key "qualifying_predictions", "drivers", column: "pole_pick_driver_id"
   add_foreign_key "qualifying_predictions", "participants"
   add_foreign_key "qualifying_results", "drivers", column: "pole_driver_id"
+  add_foreign_key "race_car_liveries", "drivers"
+  add_foreign_key "race_car_liveries", "races"
   add_foreign_key "race_results", "drivers"
   add_foreign_key "race_results", "races"
   add_foreign_key "race_tiers", "races"
