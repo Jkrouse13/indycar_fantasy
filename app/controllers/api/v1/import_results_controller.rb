@@ -13,7 +13,7 @@ class Api::V1::ImportResultsController < Api::V1::BaseController
   def confirm
     race = Race.find(params[:race_id])
     rows = params[:rows].map { |r| r.permit(:finishing_position, :car_number, :driver_name).to_h.symbolize_keys }
-    count, skipped = SportsDbImporter.new.import!(race, rows)
+    count, skipped = RaceResultImporter.new.import!(race, rows)
     render json: { success: true, imported: count, skipped: skipped, race_name: race.name }
   end
 end
