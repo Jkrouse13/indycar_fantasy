@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       get  "races/:race_id/car_liveries", to: "car_liveries#index"
       post "car_liveries/parse",   to: "car_liveries#parse"
       post "car_liveries/confirm", to: "car_liveries#confirm"
+      post "car_liveries/detect_colors", to: "car_liveries#detect_colors"
     end
   end
 end

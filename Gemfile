@@ -31,6 +31,7 @@ gem "sassc-rails"
 gem "devise"
 gem "sprockets-rails"
 gem "pdf-reader"
+gem "anthropic"
 
 group :development do
   gem "pry-rails"
@@ -41,6 +42,8 @@ group :development do
 end
 
 group :development, :test do
+  # Loads ANTHROPIC_API_KEY and other local secrets from .env
+  gem "dotenv-rails"
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)

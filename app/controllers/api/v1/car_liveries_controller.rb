@@ -28,4 +28,21 @@ class Api::V1::CarLiveriesController < Api::V1::BaseController
     count, skipped = CarLiveryImporter.new.import!(race, rows)
     render json: { success: true, updated: count, skipped: skipped, race_name: race.name }
   end
+
+  def detect_colors
+    rows = params[:rows].map { |r| r.permit(:driver_id, :image_url, :endplate_url).to_h.symbolize_keys }
+    detector = CarColorDetector.new
+
+    results = rows.each_slice(5).flat_map do |batch|
+      batch.map { |row|
+        Thread.new do
+          row.merge(detector.detect(endplate_url: row[:endplate_url], livery_url: row[:image_url]))
+        rescue => e
+          row.merge(color_error: e.message)
+        end
+      }.map(&:value)
+    end
+
+    render json: results
+  end
 end
