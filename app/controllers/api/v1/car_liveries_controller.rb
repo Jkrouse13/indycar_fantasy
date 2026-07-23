@@ -18,7 +18,13 @@ class Api::V1::CarLiveriesController < Api::V1::BaseController
     rows = SpotterGuideParser.new.parse(url)
     render json: rows.map { |r|
       driver = Driver.find_by(car_number: r[:car_number])
-      r.merge(driver_id: driver&.id, driver_name_matched: driver&.name, matched: driver.present?)
+      r.merge(
+        driver_id: driver&.id,
+        driver_name_matched: driver&.name,
+        matched: driver.present?,
+        primary_color: driver&.primary_color,
+        secondary_color: driver&.secondary_color,
+      )
     }
   end
 
@@ -30,18 +36,12 @@ class Api::V1::CarLiveriesController < Api::V1::BaseController
   end
 
   def detect_colors
-    rows = params[:rows].map { |r| r.permit(:driver_id, :image_url, :endplate_url).to_h.symbolize_keys }
+    rows = params[:rows].map { |r| r.permit(:driver_id, :car_number, :image_url, :endplate_url).to_h.symbolize_keys }
     detector = CarColorDetector.new
 
-    results = rows.each_slice(5).flat_map do |batch|
-      batch.map { |row|
-        Thread.new do
-          row.merge(detector.detect(endplate_url: row[:endplate_url], livery_url: row[:image_url]))
-        rescue => e
-          row.merge(color_error: e.message)
-        end
-      }.map(&:value)
-    end
+    results = rows.each_slice(CarColorDetector::BATCH_SIZE)
+      .map { |batch| Thread.new { detector.detect_batch(batch) } }
+      .flat_map(&:value)
 
     render json: results
   end
