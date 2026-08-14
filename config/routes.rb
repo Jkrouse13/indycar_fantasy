@@ -24,6 +24,8 @@ Rails.application.routes.draw do
       post "car_liveries/parse",   to: "car_liveries#parse"
       post "car_liveries/confirm", to: "car_liveries#confirm"
       post "car_liveries/detect_colors", to: "car_liveries#detect_colors"
+      post "tier_paste/parse",   to: "tier_paste#parse"
+      post "tier_paste/confirm", to: "tier_paste#confirm"
     end
   end
 end
