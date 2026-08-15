@@ -7,3 +7,7 @@ one:
 two:
   race: two
   tier_number: 1
+
+three:
+  race: one
+  tier_number: 2

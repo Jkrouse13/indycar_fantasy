@@ -5,7 +5,7 @@ one:
   track: MyString
   date: 2026-03-01 15:50:15
   green_flag_time: 2026-03-01 15:50:15
-  status: 1
+  status: 0
   season_year: 1
 
 two:
@@ -14,4 +14,12 @@ two:
   date: 2026-03-01 15:50:15
   green_flag_time: 2026-03-01 15:50:15
   status: 1
+  season_year: 1
+
+three:
+  name: MyString
+  track: MyString
+  date: 2026-03-01 15:50:15
+  green_flag_time: 2026-03-01 15:50:15
+  status: 0
   season_year: 1

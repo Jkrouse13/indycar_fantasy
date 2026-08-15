@@ -16,8 +16,8 @@ Rails.application.routes.draw do
       resources :participants
       resources :pool_entries
       resources :race_tiers
-      get "leaderboard/race/:race_id", to: "leaderboard#race"
-      get "leaderboard/season/:season_year", to: "leaderboard#season"
+      get "leaderboard/race/:race_id", to: "leaderboard#race", as: :leaderboard_race
+      get "leaderboard/season/:season_year", to: "leaderboard#season", as: :leaderboard_season
       post "import_results/parse",   to: "import_results#parse"
       post "import_results/confirm", to: "import_results#confirm"
       get  "races/:race_id/car_liveries", to: "car_liveries#index"
