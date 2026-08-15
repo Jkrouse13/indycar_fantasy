@@ -22,6 +22,17 @@ RailsAdmin.config do |config|
       field :team
       field :active
     end
+    edit do
+      field :name
+      field :car_number
+      field :team
+      field :active
+      field :primary_color
+      field :secondary_color
+      field :nicknames do
+        help "Comma-separated, e.g. Rocket, Sunshine, The Kid"
+      end
+    end
   end
 
   config.model "RaceTier" do

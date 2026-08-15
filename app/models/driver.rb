@@ -10,4 +10,8 @@ class Driver < ApplicationRecord
     def to_s
       "#{car_number} - #{name}"
     end
+
+    def nickname_list
+      nicknames.to_s.split(',').map(&:strip).reject(&:blank?)
+    end
 end
