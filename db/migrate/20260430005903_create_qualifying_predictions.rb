@@ -8,6 +8,6 @@ class CreateQualifyingPredictions < ActiveRecord::Migration[8.1]
       t.boolean :sunday_wreck, default: false, null: false
       t.timestamps
     end
-    add_index :qualifying_predictions, [:participant_id, :year], unique: true
+    add_index :qualifying_predictions, [ :participant_id, :year ], unique: true
   end
 end

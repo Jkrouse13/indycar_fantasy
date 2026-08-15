@@ -1,12 +1,12 @@
 class Api::V1::DriversController < Api::V1::BaseController
   def index
     drivers = Driver.includes(:team).order("car_number::integer")
-    render json: drivers, include: :team, methods: [:nickname_list]
+    render json: drivers, include: :team, methods: [ :nickname_list ]
   end
 
   def show
     driver = Driver.includes(:team).find(params[:id])
-    render json: driver, include: :team, methods: [:nickname_list]
+    render json: driver, include: :team, methods: [ :nickname_list ]
   end
 
   def create

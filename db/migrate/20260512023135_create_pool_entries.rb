@@ -9,6 +9,6 @@ class CreatePoolEntries < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :pool_entries, [:participant_id, :driver_id, :year], unique: true
+    add_index :pool_entries, [ :participant_id, :driver_id, :year ], unique: true
   end
 end

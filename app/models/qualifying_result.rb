@@ -1,5 +1,4 @@
 class QualifyingResult < ApplicationRecord
-
   belongs_to :pole_driver, class_name: "Driver", optional: true
 
   has_many :result_fast_twelves, class_name: "ResultFastTwelve", dependent: :destroy

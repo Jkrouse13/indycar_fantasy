@@ -52,22 +52,22 @@ class CarColorDetector
               type: "object",
               properties: { name: { type: "string" }, hex: { type: "string" } },
               required: %w[name hex],
-              additionalProperties: false,
+              additionalProperties: false
             },
             secondary_color: {
               type: "object",
               properties: { name: { type: "string" }, hex: { type: "string" } },
               required: %w[name hex],
-              additionalProperties: false,
-            },
+              additionalProperties: false
+            }
           },
           required: %w[car_number primary_color secondary_color],
-          additionalProperties: false,
-        },
-      },
+          additionalProperties: false
+        }
+      }
     },
-    required: ["cars"],
-    additionalProperties: false,
+    required: [ "cars" ],
+    additionalProperties: false
   }.freeze
 
   def initialize(client: Anthropic::Client.new)
@@ -82,7 +82,7 @@ class CarColorDetector
       [
         { type: "text", text: "Car ##{car[:car_number]}:" },
         { type: "image", source: { type: "url", url: car[:endplate_url] } },
-        { type: "image", source: { type: "url", url: car[:image_url] } },
+        { type: "image", source: { type: "url", url: car[:image_url] } }
       ]
     }
     content << { type: "text", text: BATCH_PROMPT }
@@ -91,7 +91,7 @@ class CarColorDetector
       model: "claude-opus-4-8",
       max_tokens: 4096,
       output_config: { format_: { schema: BATCH_COLOR_SCHEMA } },
-      messages: [{ role: "user", content: content }],
+      messages: [ { role: "user", content: content } ],
     )
 
     text_block = response.content.find { |block| block.type == :text }

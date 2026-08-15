@@ -7,5 +7,5 @@ class PoolEntry < ApplicationRecord
   validates :value, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :year, presence: true
   validates :acquisition_type, presence: true
-  validates :driver_id, uniqueness: { scope: [:participant_id, :year] }
+  validates :driver_id, uniqueness: { scope: [ :participant_id, :year ] }
 end

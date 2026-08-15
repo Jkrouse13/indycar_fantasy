@@ -5,7 +5,7 @@ class Api::V1::CarLiveriesController < Api::V1::BaseController
       h[l.driver.car_number] = {
         image_url: l.image_url,
         primary_color: l.primary_color,
-        secondary_color: l.secondary_color,
+        secondary_color: l.secondary_color
       }
     end
     render json: liveries

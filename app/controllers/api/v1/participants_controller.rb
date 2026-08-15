@@ -34,7 +34,7 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
           status: race.status
         },
         total_score: race_total,
-        rank: race.status == 'final' ? race_ranks.dig(race.id, participant.id) : nil,
+        rank: race.status == "final" ? race_ranks.dig(race.id, participant.id) : nil,
         picks: race_picks.map do |pick|
           result = results[[ pick.race_id, pick.driver_id ]]
           {

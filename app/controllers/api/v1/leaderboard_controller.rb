@@ -118,7 +118,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
     race_scores = race_ids.index_with { {} }
     picks.each do |pick|
       next unless race_ids.include?(pick.race_id)
-      pos = results[[pick.race_id, pick.driver_id]]&.finishing_position || 0
+      pos = results[[ pick.race_id, pick.driver_id ]]&.finishing_position || 0
       race_scores[pick.race_id][pick.participant_id] = (race_scores[pick.race_id][pick.participant_id] || 0) + pos
     end
 
@@ -126,7 +126,7 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
     race_averages = race_ids.to_h do |race_id|
       scores = race_scores[race_id].values
       avg = scores.any? ? (scores.sum.to_f / scores.size).round : 0
-      [race_id, avg]
+      [ race_id, avg ]
     end
 
     picks.group_by(&:participant).map do |participant, p_picks|
@@ -138,14 +138,14 @@ class Api::V1::LeaderboardController < Api::V1::BaseController
 
       best_finish = entered.map { |rid| race_scores[rid][participant.id] || 0 }.min || 999
 
-      [participant.id, {
+      [ participant.id, {
         name:          participant.name.presence || participant.email,
         total_score:   actual + penalty,
         best_finish:   best_finish,
         races_entered: entered.size,
         missed_races:  missed.size,
         penalty_score: penalty
-      }]
+      } ]
     end.to_h
   end
 

@@ -1,5 +1,4 @@
 class QualifyingPrediction < ApplicationRecord
-
   include QualifyingScoring
 
   belongs_to :participant
@@ -52,7 +51,7 @@ class QualifyingPrediction < ApplicationRecord
     sat_points = (saturday_done && !result.saturday_wreck_cancelled?) ? (saturday_wreck == result.saturday_wreck ? POINTS[:saturday_wreck] : 0) : nil
     sun_points = (sunday_done && !result.sunday_wreck_cancelled?) ? (sunday_wreck == result.sunday_wreck ? POINTS[:sunday_wreck] : 0) : nil
 
-    scored = [ft_points, lr_points, sat_points, sun_points].compact.sum
+    scored = [ ft_points, lr_points, sat_points, sun_points ].compact.sum
 
     {
       fast_twelve: ft_points,

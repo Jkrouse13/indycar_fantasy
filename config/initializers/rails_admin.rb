@@ -114,8 +114,8 @@ RailsAdmin.config do |config|
     show_in_app
 
     member :ordered_qualifying_results do
-      only ["QualifyingResult"]
-      http_methods [:get, :post]
+      only [ "QualifyingResult" ]
+      http_methods [ :get, :post ]
       turbo false
       link_icon "fas fa-flag-checkered"
       controller do
@@ -149,8 +149,8 @@ RailsAdmin.config do |config|
     end
 
     member :bulk_race_results do
-      only ["Race"]
-      http_methods [:get, :post]
+      only [ "Race" ]
+      http_methods [ :get, :post ]
       turbo false
       link_icon "fas fa-list-ol"
       controller do

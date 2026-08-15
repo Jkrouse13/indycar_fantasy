@@ -12,6 +12,6 @@ class Driver < ApplicationRecord
     end
 
     def nickname_list
-      nicknames.to_s.split(',').map(&:strip).reject(&:blank?)
+      nicknames.to_s.split(",").map(&:strip).reject(&:blank?)
     end
 end
