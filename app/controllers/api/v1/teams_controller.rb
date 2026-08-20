@@ -1,10 +1,10 @@
 class Api::V1::TeamsController < Api::V1::BaseController
   def index
-    render json: Team.includes(:drivers).all, include: :drivers
+    render json: Team.includes(:drivers).all, include: { drivers: { methods: :nickname_list } }
   end
 
   def show
-    render json: Team.includes(:drivers).find(params[:id]), include: :drivers
+    render json: Team.includes(:drivers).find(params[:id]), include: { drivers: { methods: :nickname_list } }
   end
 
   def create

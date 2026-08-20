@@ -2,7 +2,7 @@ class Api::V1::PoolEntriesController < Api::V1::BaseController
   def index
     entries = PoolEntry.includes(:participant, :driver)
     entries = entries.where(year: params[:year]) if params[:year].present?
-    render json: entries, include: [ :participant, :driver ]
+    render json: entries, include: { participant: {}, driver: { methods: :nickname_list } }
   end
 
   def create

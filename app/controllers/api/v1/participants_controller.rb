@@ -45,7 +45,8 @@ class Api::V1::ParticipantsController < Api::V1::BaseController
               car_number: pick.driver.car_number,
               team_name: pick.driver.team&.name,
               primary_color: pick.driver.primary_color,
-              secondary_color: pick.driver.secondary_color
+              secondary_color: pick.driver.secondary_color,
+              nickname_list: pick.driver.nickname_list
             },
             tier: pick.race_tier&.tier_number,
             finishing_position: result&.finishing_position

@@ -1,7 +1,7 @@
 class Api::V1::RaceResultsController < Api::V1::BaseController
   def index
     results = RaceResult.includes(:driver).where(race_id: params[:race_id])
-    render json: results, include: :driver
+    render json: results, include: { driver: { methods: :nickname_list } }
   end
 
   def create

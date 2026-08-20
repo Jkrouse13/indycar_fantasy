@@ -15,7 +15,8 @@ class Api::V1::RaceTiersController < Api::V1::BaseController
             car_number: driver.car_number,
             team_name: driver.team&.name,
             primary_color: driver.primary_color,
-            secondary_color: driver.secondary_color
+            secondary_color: driver.secondary_color,
+            nickname_list: driver.nickname_list
           }
         }
       }
